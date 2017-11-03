@@ -1,18 +1,19 @@
 """Views default.py file."""
 from pyramid.view import view_config
+from pyramid_learning_journal.data.entry_data import ENTRIES
 
 
 @view_config(route_name='list', renderer='../templates/list.jinja2')
 def list_view(request):
     """List view."""
-    return 'List View'
+    return {"entries": ENTRIES}
 
 
 @view_config(route_name='detail', renderer='../templates/detail.jinja2')
 def detail_view(request):
     """Detail view."""
     return {
-        "category": "Day 11",
+        "title": "Day 11",
         "creation_date": "October 30, 2017",
         "content": ("We got our introduction to the Pyramid framework today."
                     "It doesn't seem to be too complicated... but I don't want"

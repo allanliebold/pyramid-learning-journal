@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h1>Allan Liebold</h1>
+        {% if entries %}
+            {% for entry in entries %}
+                <article>
+                    <h2><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h2>
+                    <hr />
+                    <p><strong>{{ entry.creation_date }}</strong></p>
+                    <p>{{ entry.content }}</p>
+                </article>
+            {% endfor %}
+        {% else %}
+            <p>No journal entries.</p>
+        {% endif %}
+    </body>
+</html>
