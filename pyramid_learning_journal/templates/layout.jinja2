@@ -11,7 +11,7 @@
     <title>Allan Liebold</title>
 
     <!-- Bootstrap core CSS -->
-    <link href={{"pyramid_learning_journal:static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"}}>
+    <link href="../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom fonts for this template -->
     <link href="../static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -63,17 +63,8 @@
       </div>
     </header>
 
-    <!-- Main Content -->
-
-{{% block content%}}{{% endblock %}}
-
-    <!-- Bootstrap core JavaScript -->
-    <script src="../static/vendor/jquery/jquery.min.js"></script>
-    <script src="../static/vendor/popper/popper.min.js"></script>
-    <script src="../static/vendor/bootstrap/js/bootstrap.min.js"></script>
-
-    <!-- Custom scripts for this template -->
-    <script src="../static/js/clean-blog.min.js"></script>
+{% block content %}
+{% endblock %}
 
   </body>
 
