@@ -1,29 +1,40 @@
-from pyramid.response import Response
-import os
-import io
+"""Views default.py file."""
+from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPNotFound
+from pyramid_learning_journal.data.entry_data import ENTRIES
 
-HERE = os.path.dirname(__file__)
 
-
+@view_config(route_name='list', renderer='../templates/list.jinja2')
 def list_view(request):
-    path = os.path.join(HERE, '../templates/list.html')
-    with io.open(path) as file:
-        return Response(file.read())
+    """List view."""
+    return {"entries": ENTRIES}
 
 
+@view_config(route_name='detail', renderer='../templates/detail.jinja2')
 def detail_view(request):
-    path = os.path.join(HERE, '../templates/detail.html')
-    with io.open(path) as file:
-        return Response(file.read())
+    """Detail view."""
+    target = int(request.matchdict('id'))
+    for entry in ENTRIES:
+        if entry['id'] == target:
+            return {
+                'entry': entry
+            }
+    raise HTTPNotFound
 
 
+@view_config(route_name='create', renderer='../templates/create.jinja2')
 def create_view(request):
-    path = os.path.join(HERE, '../templates/create.html')
-    with io.open(path) as file:
-        return Response(file.read())
+    """Create view."""
+    return {}
 
 
+@view_config(route_name='update', renderer='../templates/update.jinja2')
 def update_view(request):
-    path = os.path.join(HERE, '../templates/update.html')
-    with io.open(path) as file:
-        return Response(file.read())
+    """Update view."""
+    target = int(request.matchdict('id'))
+    for entry in ENTRIES:
+        if entry['id'] == target:
+            return {
+                'entry': entry
+            }
+    raise HTTPNotFound
