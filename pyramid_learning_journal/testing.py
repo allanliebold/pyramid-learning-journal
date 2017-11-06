@@ -1,55 +1,131 @@
 """Testing for Learning Journal."""
 
-from pyramid import testing
-from pyramid_learning_journal.data.entry_data import ENTRIES
 import pytest
+from datetime import datetime
+from faker import Faker
+from pyramid import testing
+import transaction
+from pyramid_learning_journal.models import (
+    Entry,
+    get_tm_session,
+)
+from pyramid_learning_journal.models.meta import Base
 
 
-@pytest.fixture()
-def testapp():
+FAKE_FACTORY = Faker()
+ENTRY_LIST = [Entry(
+    title="Test Entry",
+    body=FAKE_FACTORY.text(100),
+    created=datetime.now(),
+) for i in range(20)]
+
+
+@pytest.fixture(scope="session")
+def testapp(request):
     """Create an instance for testing."""
-    from pyramid_learning_journal import main
-    app = main({})
     from webtest import TestApp
-    return TestApp(app)
+    from pyramid_learning_journal import main
+
+    app = main({}, **{"sqlalchemy.url": "postgres:///test_entries"})
+    SessionFactory = app.registry["dbsession_factory"]
+    engine = SessionFactory().bind
+    Base.metadata.create_all(bind=engine)
+
+    request.addfinalizer(tearDown)
+
+    return testapp
 
 
-def test_root_contents(testapp):
-    """Test contents of root page contents."""
-    from pyramid_learning_journal.data.entry_data import ENTRIES
-    response = testapp.get('/', status=200)
-    html = response.html
-    assert len(ENTRIES) == len(html.findAll("article"))
+@pytest.fixture
+def fill_the_db(testapp):
+    """Add items to the database."""
+    SessionFactory = testapp.app.registry["dbsession_factory"]
+    with transaction.manager:
+        dbsession = get_tm_session(SessionFactory, transaction.manager)
+        dbsession.add_all(ENTRY_LIST)
+
+    return dbsession
 
 
-def test_list_view_returns_dict():
+@pytest.fixture
+def add_models(dummy_request):
+    """Add model instances to the database."""
+    dummy_request.dbsession.add_all(ENTRY_LIST)
+
+
+@pytest.fixture(scope="session")
+def configuration(request):
+    """Set up Configurator instance."""
+    config = testing.setUp(settings={
+        'sqlalchemy.url': 'postgres:///test_entries'
+    })
+    config.include("pyramid_learning_journal.models")
+
+    def teardown():
+        testing.tearDown()
+
+    request.addfinalizer(teardown)
+    return config
+
+
+@pytest.fixture
+def db_session(configuration, request):
+    """Create a database session."""
+    SessionFactory = configuration.registry["dbsession_factory"]
+    session = SessionFactory()
+    engine = session.bind
+    Base.metadata.create_all(engine)
+
+    def teardown():
+        session.transaction.rollback()
+        Base.metadata.drop_all(engine)
+
+    request.addfinalizer(teardown)
+    return session
+
+
+@pytest.fixture
+def dummy_request(db_session):
+    """Create a dummy request."""
+    return testing.DummyRequest(dbsession=db_session)
+
+
+def test_model_gets_added(db_session):
+    """Test adding model to database."""
+    assert len(db_session.query(Entry).all()) == 0
+    model = Entry(
+        title="Test Entry",
+        body="This is a test entry.",
+        created=datetime.now(),
+    )
+    db_session.add(model)
+    assert len(db_session.query(Entry).all()) == 1
+
+
+def test_list_view_returns_dict(dummy_request):
     """List view returns response."""
     from pyramid_learning_journal.views.default import list_view
-    request = testing.DummyRequest()
-    response = list_view(request)
+    response = list_view(dummy_request)
     assert isinstance(response, dict)
 
 
-def test_list_view_returns_len_content():
-    """List view response has correct amount of content."""
+def test_list_view_returns_count_matching_database(dummy_request):
+    """List view matches database count."""
     from pyramid_learning_journal.views.default import list_view
-    request = testing.DummyRequest()
-    response = list_view(request)
-    assert len(response['entries']) == len(ENTRIES)
+    response = list_view(dummy_request)
+    query = dummy_request.dbsession.query(Entry)
+    assert len(response['entries']) == query.count()
 
 
-def test_detail_view():
-    """Test detail view returns dictionary of values."""
-    from pyramid_learning_journal.views.default import detail_view
-    request = testing.DummyRequest()
-    info = detail_view(request)
-    assert isinstance(info, dict)
+# def test_list_view_returns_empty_when_database_empty(dummy_request):
+#     """List view returns empty when no data in database."""
+#     from pyramid_learning_journal.views.default import list_view
+#     response = list_view(dummy_request)
+#     assert len(response['entries']) == 0
 
 
-def test_detail_view_response_contains_expense_attrs():
-    """Test detail view returns entry."""
-    from pyramid_learning_journal.views.default import detail_view
-    request = testing.DummyRequest()
-    info = detail_view(request)
-    for key in ["created", "title", "text"]:
-        assert key in info.keys()
+# def test_create_view(dummy_request):
+#     """Create view."""
+#     from pyramid_learning_journal.views.default import create_view
+#     response = create_view(dummy_request)
+#     assert isinstance(response, dict)
