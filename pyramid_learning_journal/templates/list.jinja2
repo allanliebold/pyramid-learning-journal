@@ -6,7 +6,7 @@
                 <h2><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h2>
                 <hr />
                 <p><strong>{{ entry.created }}</strong></p>
-                <p>{{ entry.text }}</p>
+                <p>{{ entry.body }}</p>
             </article>
         {% endfor %}
     {% endif %}
