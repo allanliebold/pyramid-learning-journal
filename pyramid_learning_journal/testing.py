@@ -117,15 +117,19 @@ def test_list_view_returns_count_matching_database(dummy_request):
     assert len(response['entries']) == query.count()
 
 
-# def test_list_view_returns_empty_when_database_empty(dummy_request):
-#     """List view returns empty when no data in database."""
-#     from pyramid_learning_journal.views.default import list_view
-#     response = list_view(dummy_request)
-#     assert len(response['entries']) == 0
+def test_create_view_post_empty_is_empty_dict(dummy_request):
+    """Post request without data should return an empty dictionary."""
+    from pyramid_learning_journal.views.default import create_view
+    dummy_request.method = "POST"
+    response = create_view(dummy_request)
+    assert response == {}
 
 
-# def test_create_view(dummy_request):
-#     """Create view."""
-#     from pyramid_learning_journal.views.default import create_view
-#     response = create_view(dummy_request)
-#     assert isinstance(response, dict)
+def test_create_view_post_incomplete_data_returns_data(dummy_request):
+    """Post data that is incomplete just gets returned to the user."""
+    from pyramid_learning_journal.views.default import create_view
+    dummy_request.method = "POST"
+    data_dict = {"title": "Test Entry"}
+    dummy_request.POST = data_dict
+    response = create_view(dummy_request)
+    assert response == data_dict
