@@ -1,19 +1,21 @@
 {% extends "layout.jinja2" %}
 {% block content %}
-    <form method="POST">
-        <table>
-            <tr>
-                <td><h1>{{ entry.title }}</h1>
-                <hr /></td>
-            </tr>
-            <tr>
-                <td>
-                <textarea rows="4" cols="50" name="body"  required>{{ entry.body }}</textarea></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><input type="submit" value="Edit Entry" /></td>
-            </tr>
-        </table>
-    </form>
+    <article>
+        <form method="POST">
+            <table>
+                <tr>
+                    <td><h1>{{ entry.title }}</h1>
+                    <hr /></td>
+                </tr>
+                <tr>
+                    <td>
+                    <textarea rows="4" cols="50" name="body"  required>{{ entry.body }}</textarea></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Edit Entry" /></td>
+                </tr>
+            </table>
+        </form>
+    </article>
 {% endblock %}
