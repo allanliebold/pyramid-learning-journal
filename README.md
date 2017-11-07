@@ -7,7 +7,7 @@ Heroku: https://sheltered-inlet-14538.herokuapp.com/
 ## Routes:
 
 - `/` - home page, lists all journal entries
-- `/journal/create-entry` - to create a new journal entry
+- `/journal/new-entry` - to create a new journal entry
 - `/journal/{id:\d+}` - view a specific entry
 - `/journal/{id:\d+}/edit-entry` - edit an existing entry
 
