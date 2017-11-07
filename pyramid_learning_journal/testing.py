@@ -37,6 +37,15 @@ def testapp(request):
 
 
 @pytest.fixture
+def empty_db(testapp):
+    """Tear down database and add table."""
+    SessionFactory = testapp.app.registry["dbsession_factory"]
+    engine = SessionFactory().bind
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+
+@pytest.fixture
 def fill_the_db(testapp):
     """Add items to the database."""
     SessionFactory = testapp.app.registry["dbsession_factory"]
@@ -60,6 +69,7 @@ def configuration(request):
         'sqlalchemy.url': 'postgres:///test_entries'
     })
     config.include("pyramid_learning_journal.models")
+    config.include("pyramid_learning_journal.routes")
 
     def teardown():
         testing.tearDown()
@@ -133,3 +143,29 @@ def test_create_view_post_incomplete_data_returns_data(dummy_request):
     dummy_request.POST = data_dict
     response = create_view(dummy_request)
     assert response == data_dict
+
+
+# def test_new_expense_redirects_home(testapp, empty_db):
+#     """Redirection routes to home page."""
+#     data_dict = {
+#         "title": "Test Entry",
+#         "body": "Test entry body text."
+#     }
+
+#     response = testapp.post('/new_entry', data_dict)
+#     next_response = response.follow()
+#     home_response = testapp.get('/')
+#     assert next_response.text == home_response.text
+
+
+# def test_create_view_post_good_data_is_302(dummy_request):
+#     """Post request with correct data should redirect with status 302."""
+#     from pyramid_learning_journal.views.default import create_view
+#     dummy_request.method = "POST"
+#     data_dict = {
+#         "title": "Test Entry",
+#         "body": "Test entry body text.",
+#     }
+#     dummy_request.POST = data_dict
+#     response = create_view(dummy_request)
+#     assert response.status_code == 302
