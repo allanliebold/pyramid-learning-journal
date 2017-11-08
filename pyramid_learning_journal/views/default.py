@@ -54,18 +54,19 @@ def update_view(request):
     """Update view. Edit an Entry."""
     target = int(request.matchdict['id'])
     entry = request.dbsession.query(Entry).get(target)
+    if not entry:
+        raise HTTPNotFound
     if request.method == "GET":
         return {
             'entry': entry.to_dict()
         }
     if request.method == "POST" and request.POST:
+        entry.title = request.POST['title']
         entry.body = request.POST['body']
         entry.created = datetime.now()
         request.dbsession.add(entry)
         request.dbsession.flush()
         return HTTPFound(request.route_url('detail', id=entry.id))
-    else:
-        raise HTTPNotFound
 
 
 @view_config(route_name='delete')
