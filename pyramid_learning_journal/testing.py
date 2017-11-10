@@ -1,6 +1,6 @@
 """Testing for Learning Journal."""
 
-import pytest
+#import pytest
 from datetime import datetime
 from faker import Faker
 from pyramid import testing
