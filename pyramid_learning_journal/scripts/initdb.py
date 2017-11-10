@@ -36,6 +36,7 @@ def main(argv=sys.argv):
     options = parse_vars(argv[2:])
     setup_logging(config_uri)
     settings = get_appsettings(config_uri, options=options)
+    settings['sqlalchemy.url'] = os.environ.get('DATABASE_URL', '')
 
     engine = get_engine(settings)
     Base.metadata.drop_all(engine)
@@ -47,10 +48,10 @@ def main(argv=sys.argv):
         dbsession = get_tm_session(session_factory, transaction.manager)
 
         many_models = []
-        for item in ENTRIES:
+        for entry in ENTRIES:
             new_entry = Entry(
-                title=item["title"],
-                body=item["body"],
+                title=entry["title"],
+                body=entry["body"],
                 created=datetime.now(),
             )
             many_models.append(new_entry)

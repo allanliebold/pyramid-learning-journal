@@ -18,3 +18,11 @@ class Entry(Base):
     title = Column(Text)
     body = Column(Text)
     created = Column(Date)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'body': self.body,
+            'created': self.created.strftime('%Y-%m-%d')
+        }

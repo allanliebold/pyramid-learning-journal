@@ -1,10 +1,22 @@
 {% extends "layout.jinja2" %}
 {% block content %}
     <article>
-        <h1>{{ title }}</h1>
-        <hr />
-        <p><strong>{{ created }}</strong></p>
-        <hr />
-        <p>{{ body }}</p>
+        <form method="POST">
+            <table>
+                <tr>
+                    <td><h1>{{ title }}</h1>
+                    <hr /></td>
+                </tr>
+                <tr>
+                    <td>
+                    <p>{{ body }}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><a href="{{ request.route_url('update', id=id) }}"><btn>Edit</btn></a></td>
+                </tr>
+            </table>
+        </form>
     </article>
 {% endblock %}
