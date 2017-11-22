@@ -1,5 +1,7 @@
 """Views default.py file."""
 from pyramid.view import view_config
+from pyramid.security import remember, forget
+from pyramid_learning_journal.security import check_credentials
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid_learning_journal.models.entries import Entry
 from datetime import datetime
@@ -69,6 +71,16 @@ def update_view(request):
         return HTTPFound(request.route_url('detail', id=entry.id))
 
 
+@view_config(route_name='private', renderer='string', permission='secret')
+def private(request):
+    return "Private view"
+
+
+@view_config(route_name='public', renderer='string')
+def public(request):
+    return "Public view"
+
+
 @view_config(route_name='delete')
 def delete_view(request):
     """Delete an entry."""
@@ -78,3 +90,21 @@ def delete_view(request):
         request.dbsession.delete(Entry)
     else:
         raise HTTPNotFound
+
+
+@view_config(route_name='login', renderer='../templates/login.jinja2')
+def login(request):
+    """User login."""
+    if request.method == 'POST':
+        username = request.params.get('username', '')
+        password = request.params.get('password', '')
+        if check_credentials(username, password):
+            headers = remember(request, username)
+            return HTTPFound(location=request.route_url('list'), headers=headers)
+    return {}
+
+
+@view_config(route_name='logout')
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(request.route_url('list'), headers=headers)
