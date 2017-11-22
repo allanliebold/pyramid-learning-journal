@@ -43,7 +43,7 @@ def create_view(request):
                 new_entry = Entry(
                     title=form_data['title'],
                     body=form_data['body'],
-                    createreated=datetime.now(),
+                    created=datetime.now(),
                 )
             request.dbsession.add(new_entry)
             return {}
@@ -83,7 +83,7 @@ def public(request):
 
 @view_config(route_name='delete')
 def delete_view(request):
-    """Delete an entry."""
+    """Delete an entry. Not functional yet."""
     target = int(request.matchdict['id'])
     entry = request.dbsession.query(Entry).get(target)
     if entry:
