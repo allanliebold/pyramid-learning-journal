@@ -19,12 +19,12 @@ def test_list_view_ok():
     assert response.status_code == 200
 
 
-def test_list_view_content():
-    """List view response has page title in body."""
+def test_list_view_type():
+    """List view response body is html."""
     from pyramid_learning_journal.views.default import list_view
     request = testing.DummyRequest()
     response = list_view(request)
-    assert '<title>Allan Liebold</title>' in response.body
+    assert response.content_type == 'text/html'
 
 
 def test_create_view_ok():
@@ -35,9 +35,9 @@ def test_create_view_ok():
     assert response.status_code == 200
 
 
-def test_create_view_content():
-    """Create view response has Write Post page in body."""
+def test_create_view_type():
+    """Create view response body is html."""
     from pyramid_learning_journal.views.default import create_view
     request = testing.DummyRequest()
     response = create_view(request)
-    assert '<title>Write Post</title>' in response.body
+    assert response.content_type == 'text/html'
