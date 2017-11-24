@@ -1,3 +1,4 @@
+"""Database Initialization."""
 import os
 import sys
 import transaction
@@ -5,7 +6,7 @@ import transaction
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
-    )
+)
 
 from pyramid.scripts.common import parse_vars
 
@@ -14,8 +15,11 @@ from ..models import (
     get_engine,
     get_session_factory,
     get_tm_session,
-    )
-from ..models import MyModel
+)
+
+from pyramid_learning_journal.models.entries import Entry
+from pyramid_learning_journal.data.entry_data import ENTRIES
+from datetime import datetime
 
 
 def usage(argv):
@@ -32,8 +36,10 @@ def main(argv=sys.argv):
     options = parse_vars(argv[2:])
     setup_logging(config_uri)
     settings = get_appsettings(config_uri, options=options)
+    settings['sqlalchemy.url'] = os.environ.get('DATABASE_URL', '')
 
     engine = get_engine(settings)
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
     session_factory = get_session_factory(engine)
@@ -41,5 +47,12 @@ def main(argv=sys.argv):
     with transaction.manager:
         dbsession = get_tm_session(session_factory, transaction.manager)
 
-        model = MyModel(name='one', value=1)
-        dbsession.add(model)
+        many_models = []
+        for entry in ENTRIES:
+            new_entry = Entry(
+                title=entry["title"],
+                body=entry["body"],
+                created=datetime.now(),
+            )
+            many_models.append(new_entry)
+        dbsession.add_all(many_models)

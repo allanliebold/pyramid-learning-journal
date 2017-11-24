@@ -7,11 +7,8 @@ Heroku: https://sheltered-inlet-14538.herokuapp.com/
 ## Routes:
 
 - `/` - home page, lists all journal entries
-<<<<<<< HEAD
-- `/journal/create-entry` - to create a new journal entry
-=======
 - `/journal/new-entry` - to create a new journal entry
->>>>>>> 53683f2ed619da31508974c742482f5b75f70a47
+- `/journal/new-entry` - to create a new journal entry
 - `/journal/{id:\d+}` - view a specific entry
 - `/journal/{id:\d+}/edit-entry` - edit an existing entry
 
@@ -29,8 +26,6 @@ Heroku: https://sheltered-inlet-14538.herokuapp.com/
 
 ```
 $ pytest pyramid_learning_journal
+or
+$ tox
 ```
-<<<<<<< HEAD
-
-=======
->>>>>>> 53683f2ed619da31508974c742482f5b75f70a47
